@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import authRouter from './routes/authRoute'
 import taskRouter from './routes/taskRoute'
 import noteRouter from './routes/noteRoute'
+import promoRouter from './routes/promoRoute'
 import { authentication } from './middlewares/authentication';
 import cookieParser from 'cookie-parser';
 dotenv.config();
@@ -22,9 +23,10 @@ app.use(express.json());
 
 app.use(cookieParser());
 
-app.use('/api/v1/auth/',authRouter);
-app.use('/api/v1/task/',taskRouter);
-app.use('/api/v1/note/',noteRouter);
+app.use('/api/v1/auth',authRouter);
+app.use('/api/v1/task',taskRouter);
+app.use('/api/v1/note',noteRouter);
+app.use('/api/v1/promo',promoRouter);
 
 mongoose.connect('mongodb://localhost:27017/ticktick')
     .then(() => {
