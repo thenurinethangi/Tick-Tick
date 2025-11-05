@@ -230,3 +230,37 @@ export const getTodayTasks = async (req: AuthRequest,res: Response) => {
     res.status(202).json({message: 'Successfully Load Today Tasks', data: allTasks});
     return;
 }
+
+
+export const getNext7DaysTasks = async (req: AuthRequest,res: Response) => {
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+
+    const next7daysTasks = [];
+    for (let i = 0; i < 7; i++) {
+
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+
+        const startOfDay = d.setHours(0, 0, 0, 0);
+        const endOfDay = d.setHours(23, 59, 59, 999);
+
+        let filter2 = {userId: user._id, date: {$gte: startOfDay, $lte: endOfDay}}
+        const tasks = await Task.find(filter2);
+
+        next7daysTasks.push(tasks);
+    }
+
+    res.status(202).json({message: 'Successfully Load Next 7 Days Tasks', data: next7daysTasks});
+    return;
+}
