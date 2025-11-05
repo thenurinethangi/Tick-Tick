@@ -130,3 +130,25 @@ export const editNote = async (req: AuthRequest,res: Response) => {
         return;
     }
 }
+
+
+export const getAllNotes = async (req: AuthRequest,res: Response) => {
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+
+    let filter2 = {userId: user._id}
+    const allNotes = await Note.find(filter2);
+
+    res.status(202).json({message: 'Successfully Loaded All Notes!', data: allNotes});
+    return;
+}
