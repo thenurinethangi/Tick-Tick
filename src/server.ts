@@ -4,6 +4,7 @@ import cors from 'cors'
 import mongoose from 'mongoose';
 import authRouter from './routes/authRoute'
 import taskRouter from './routes/taskRoute'
+import noteRouter from './routes/noteRoute'
 import { authentication } from './middlewares/authentication';
 import cookieParser from 'cookie-parser';
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(cookieParser());
 
 app.use('/api/v1/auth/',authRouter);
 app.use('/api/v1/task/',taskRouter);
+app.use('/api/v1/note/',noteRouter);
 
 mongoose.connect('mongodb://localhost:27017/ticktick')
     .then(() => {
