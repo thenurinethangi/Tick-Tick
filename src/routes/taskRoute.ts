@@ -20,6 +20,6 @@ router.get('/next7days',authentication,getNext7DaysTasks);
 
 router.get('/other',authentication,getOtherTasks);
 
-// router.get('/overdue',authentication,getOverdueTasks);
+router.get('/overdue',authentication,getOverdueTasks);
 
 export default router;

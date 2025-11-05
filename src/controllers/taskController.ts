@@ -1,7 +1,7 @@
 import express, {Request,Response,NextFunction} from 'express'
 import { AuthRequest } from '../middlewares/authentication';
 import { User } from '../models/userModel';
-import { Task } from '../models/taskModel';
+import { Status, Task } from '../models/taskModel';
 
 export const addTask = async (req: AuthRequest,res: Response) => {
 
@@ -289,5 +289,30 @@ export const getOtherTasks = async (req: AuthRequest,res: Response) => {
     const otherTasks = await Task.find(filter2);
 
     res.status(202).json({message: 'Successfully Load Other Tasks', data: otherTasks});
+    return;
+}
+
+
+export const getOverdueTasks = async (req: AuthRequest,res: Response) => {
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+
+    const today = new Date();
+    const todayStart = today.setHours(0, 0, 0, 0);
+
+    let filter2 = {userId: user._id, date: {$lt: todayStart}, status: Status.INCOMPLETE}
+    const overdueTasks = await Task.find(filter2);
+
+    res.status(202).json({message: 'Successfully Load Overdue Tasks', data: overdueTasks});
     return;
 }
