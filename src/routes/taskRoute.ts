@@ -1,5 +1,5 @@
 import express from 'express'
-import { addTask, deleteTask, editDate, editPriority, getAllTasks, getTodayTasks, getNext7DaysTasks, getOtherTasks, getOverdueTasks } from '../controllers/taskController';
+import { addTask, deleteTask, editDate, editPriority, getAllTasks, getTodayTasks, getNext7DaysTasks, getOtherTasks, getOverdueTasks, markAsComplete } from '../controllers/taskController';
 import { authentication } from '../middlewares/authentication';
 
 const router = express.Router();
@@ -11,6 +11,8 @@ router.delete('/delete/:id',authentication,deleteTask);
 router.put('/edit/date',authentication,editDate);
 
 router.put('/edit/priority',authentication,editPriority);
+
+router.put('/edit/markAsComplete/:id',authentication,markAsComplete);
 
 router.get('/all',authentication,getAllTasks);
 
