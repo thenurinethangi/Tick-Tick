@@ -52,3 +52,54 @@ export const addPromo = async (req: AuthRequest,res: Response) => {
     res.status(202).json({message: 'Successfully Added New Promo!', data: savedPromo});
     return;
 }
+
+
+export const getTotalPromo = async (req: AuthRequest,res: Response) => {
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+    
+    let filter2 = {userId: user._id};
+    const allPromos = await Promo.find(filter2);
+
+    res.status(202).json({message: 'Successfully Get Total Promo Count!', data: allPromos.length});
+    return;
+}
+
+
+export const getTodayPromo = async (req: AuthRequest,res: Response) => {
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+
+    const now = new Date();
+    const offsetMs = now.getTimezoneOffset() * 60 * 1000;
+    const localDate = new Date(now.getTime() - offsetMs);
+
+    const start = localDate.setHours(0,0,0,0);
+    const end = localDate.setHours(23, 59, 59, 999);
+    
+    let filter2 = {userId: user._id, date: {$gte: start, $lte: end}};
+    const todayPromos = await Promo.find(filter2);
+
+    res.status(202).json({message: 'Successfully Get Today Promo Count!', data: todayPromos});
+    return;
+}
