@@ -202,3 +202,31 @@ export const getAllTasks = async (req: AuthRequest,res: Response) => {
     res.status(202).json({message: 'Successfully Load All Tasks', data: allTasks});
     return;
 }
+
+
+export const getTodayTasks = async (req: AuthRequest,res: Response) => {
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    let filter2 = {userId: user._id, date: {$gte: startOfDay, $lte: endOfDay}}
+    const allTasks = await Task.find(filter2);
+
+    res.status(202).json({message: 'Successfully Load Today Tasks', data: allTasks});
+    return;
+}
