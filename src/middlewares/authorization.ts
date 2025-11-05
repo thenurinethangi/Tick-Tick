@@ -1,16 +1,12 @@
 import { Request, Response, NextFunction } from "express"
 import { Role } from "../models/userModel";
-
-interface authRequest extends Request{
-    username?: string
-    roles?: Role[]
-} 
+import { AuthRequest } from "./authentication";
 
 export const authorization = (roles1: Role[]) => {
 
     console.log('roles1',roles1);
 
-    return (req: authRequest, res: Response, next: NextFunction) => {
+    return (req: AuthRequest, res: Response, next: NextFunction) => {
         console.log('req username',req.username);
         const username = req.username;
         console.log('req roles',req.roles);

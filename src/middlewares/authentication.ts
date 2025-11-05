@@ -2,12 +2,12 @@ import { Request, Response, NextFunction } from "express"
 import { validateToken } from "../utils/jwtutil";
 import { Role } from "../models/userModel";
 
-interface authRequest extends Request{
+export interface AuthRequest extends Request{
     username?: string
     roles?: Role[]
 }
 
-export const authentication = (req: authRequest, res: Response, next: NextFunction) => {
+export const authentication = (req: AuthRequest, res: Response, next: NextFunction) => {
 
     const jwtToken = req.cookies.jwt;
 

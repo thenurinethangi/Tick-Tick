@@ -29,7 +29,7 @@ const taskSchema = new Schema<ITask>({
     date: {type: Date, require: true},
     note: {type: String, require: true},
     priority: {type: String, enum: Object.values(Priority), require: true},
-    status: {type: String, enum: Object.values(Status), require: true},
+    status: {type: String, enum: Object.values(Status), require: true, default: Status.INCOMPLETE},
     userId: {type: Schema.Types.ObjectId, ref: 'User', require: true}
 });
 
