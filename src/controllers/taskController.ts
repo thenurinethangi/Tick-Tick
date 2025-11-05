@@ -38,6 +38,7 @@ export const addTask = async (req: AuthRequest,res: Response) => {
     return;
 }
 
+
 export const deleteTask = async (req: AuthRequest,res: Response) => {
 
     const _id = req.params.id;
@@ -80,6 +81,54 @@ export const deleteTask = async (req: AuthRequest,res: Response) => {
     }
     else{
         res.status(5000).json({message: 'Failed To Delete The Task, Try Later!', data: null});
+        return;
+    }
+}
+
+
+export const editDate = async (req: AuthRequest,res: Response) => {
+
+    const {id,date} = req.body;
+
+    if(!id || !date){
+        res.status(400).json({message: 'Need Task ID And New Date To Edit The Task Date!', data: null});
+        return;
+    }
+
+    let filter1 = {_id: id};
+    const task = await Task.findOne(filter1);
+    if(!task){
+        res.status(404).json({message: 'Task Not Found!', data: null});
+        return;
+    }
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter2 = {username: req.username};
+    const user = await User.findOne(filter2);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+
+    if(task.userId.toString() !== user._id.toString()){
+        res.status(400).json({message: 'You Can Only Edit Your Tasks!', data: null});
+        return;
+    }
+
+    let filter3  = {_id: task._id};
+    let updateQuery = {date: new Date(date)};
+    const result = await Task.updateOne(filter3,updateQuery);
+
+    if(result){
+        res.status(202).json({message: 'Successfully Edited Date Of Task ID: '+task._id, data: null});
+        return;
+    }
+    else{
+        res.status(500).json({message: 'Failed To Edit Date Of The Task, Try Later!', data: null});
         return;
     }
 }
