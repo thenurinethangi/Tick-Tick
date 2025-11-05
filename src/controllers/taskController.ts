@@ -216,7 +216,7 @@ export const markAsComplete = async (req: AuthRequest,res: Response) => {
     }
 
     if(task.status != Status.INCOMPLETE){
-        res.status(400).json({message: 'You Can\'t Mark As Complete Deleted And NotDo Tasks!', data: null});
+        res.status(400).json({message: 'You Can\'t Mark As Complete, Deleted And NotDo Tasks!', data: null});
         return;
     }
 
@@ -233,6 +233,62 @@ export const markAsComplete = async (req: AuthRequest,res: Response) => {
         return;
     }
 }
+
+
+export const markAsNotDo = async (req: AuthRequest,res: Response) => {
+
+    const id = req.params.id;
+
+    if(!id){
+        res.status(400).json({message: 'Need Task ID To Mark It As Not Do!', data: null});
+        return;
+    }
+
+    let filter1 = {_id: id};
+    const task = await Task.findOne(filter1);
+    if(!task){
+        res.status(404).json({message: 'Task Not Found!', data: null});
+        return;
+    }
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter2 = {username: req.username};
+    const user = await User.findOne(filter2);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+
+    if(task.userId.toString() !== user._id.toString()){
+        res.status(400).json({message: 'You Can Only Edit Your Tasks!', data: null});
+        return;
+    }
+
+    if(task.status != Status.INCOMPLETE){
+        res.status(400).json({message: 'You Can\'t Mark As Not Do, Deleted And Completed Tasks!', data: null});
+        return;
+    }
+
+    let filter3  = {_id: task._id};
+    let updateQuery = {status: Status.NOTDO};
+    const result = await Task.updateOne(filter3,updateQuery);
+
+    if(result){
+        res.status(202).json({message: 'Successfully Mark Task ID: '+task._id+' As Not Do', data: null});
+        return;
+    }
+    else{
+        res.status(500).json({message: 'Failed To Mark Tasks As Not Do, Try Later!', data: null});
+        return;
+    }
+}
+
+
+
 
 
 export const getAllTasks = async (req: AuthRequest,res: Response) => {
