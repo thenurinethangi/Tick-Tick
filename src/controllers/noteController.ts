@@ -35,3 +35,50 @@ export const addNote = async (req: AuthRequest,res: Response) => {
     res.status(202).json({message: 'Successfully Add New Note!', data: savedNote});
     return;
 }
+
+
+export const deleteNote = async (req: AuthRequest,res: Response) => {
+
+    const id = req.params.id;
+
+    if(!id){
+        res.status(400).json({message: 'Need Note ID To Delete The Note!', data: null});
+        return;
+    }
+
+    let filter1 = {_id: id};
+    const note = await Note.findOne(filter1);
+
+    if(!note){
+        res.status(401).json({message: 'Note Is Not Found!', data: null});
+        return;
+    }
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter2 = {username: req.username};
+    const user = await User.findOne(filter2);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+
+    if(note.userId.toString() !== user._id.toString()){
+        res.status(401).json({message: 'You Can Only Delete Your Notes!', data: null});
+        return;
+    }
+
+    const result = await Note.deleteOne(filter1);
+
+    if(result){
+        res.status(202).json({message: 'Successfully Deleted Note ID: '+note._id, data: null});
+        return;
+    }
+    else{
+        res.status(202).json({message: 'Failed To Delete Note, Try Again Later!', data: null});
+        return;
+    }
+}
