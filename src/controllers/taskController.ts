@@ -264,3 +264,30 @@ export const getNext7DaysTasks = async (req: AuthRequest,res: Response) => {
     res.status(202).json({message: 'Successfully Load Next 7 Days Tasks', data: next7daysTasks});
     return;
 }
+
+
+export const getOtherTasks = async (req: AuthRequest,res: Response) => {
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+
+    const dayAfter7Days = new Date();
+    dayAfter7Days.setDate(dayAfter7Days.getDate() + 6);
+
+    const end = dayAfter7Days.setHours(23, 59, 59, 999);
+
+    let filter2 = {userId: user._id, date: {$gt: end}}
+    const otherTasks = await Task.find(filter2);
+
+    res.status(202).json({message: 'Successfully Load Other Tasks', data: otherTasks});
+    return;
+}
