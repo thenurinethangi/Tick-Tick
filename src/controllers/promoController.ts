@@ -103,3 +103,31 @@ export const getTodayPromo = async (req: AuthRequest,res: Response) => {
     res.status(202).json({message: 'Successfully Get Today Promo Count!', data: todayPromos});
     return;
 }
+
+
+export const getTotalTime = async (req: AuthRequest,res: Response) => {
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+    
+    let filter2 = {userId: user._id};
+    const allPromos = await Promo.find(filter2);
+
+    let sum = 0;
+    for (let i = 0; i < allPromos.length; i++) {
+        let timeInNumber = Number(allPromos[i].time);
+        sum+=timeInNumber;
+    }
+
+    res.status(202).json({message: 'Successfully Get Total Promo Time!', data: sum});
+    return;
+}
