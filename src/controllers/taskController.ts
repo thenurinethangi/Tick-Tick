@@ -704,6 +704,67 @@ export const getUrgentTasks = async (req: AuthRequest,res: Response) => {
         }
     }
 
-    res.status(202).json({message: 'Success!', data: urgentTasksWithDates});
+    res.status(202).json({message: 'Successfully Load All Urgent Tasks!', data: urgentTasksWithDates});
+    return;
+}
+
+
+export const getNotUrgentTasks = async (req: AuthRequest,res: Response) => {
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+
+    const filter2 = {userId: user._id,priority: Priority.NOT_URGENT, status: Status.INCOMPLETE};
+    const filter3 = {date: true}
+    const dateList = await Task.find(filter2,filter3).sort({date: 'asc'});
+
+    const uniqueDates = [
+        ...new Map(
+        dateList.map(item => [item.date.toISOString().split('T')[0], item])
+        ).values()
+        ];
+
+    const notUrgentTasksWithDates = [];
+    const overdueList = [];
+    for (let i = 0; i < uniqueDates.length; i++) {
+        const e = uniqueDates[i];
+        
+        if (e.date < new Date()){
+            let filter4 = {userId: user._id, date: e.date, priority: Priority.NOT_URGENT, status: Status.INCOMPLETE}
+            const t = await Task.find(filter4);
+
+            for (let j = 0; j < t.length; j++) {
+                overdueList.push(t[j]);   
+            }
+        }
+    }
+
+    notUrgentTasksWithDates.push({0: {date: 'Overdue', tasks: overdueList}});
+
+    let count = 1;
+    for (let i = 0; i < uniqueDates.length; i++) {
+        const e = uniqueDates[i];
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (e.date >= today){
+            let filter5 = {userId: user._id, date: e.date, priority: Priority.NOT_URGENT, status: Status.INCOMPLETE}
+            const t = await Task.find(filter5);
+
+            notUrgentTasksWithDates.push({[count]: {date: e.date, tasks: t}});
+            count++;
+        }
+    }
+
+    res.status(202).json({message: 'Successfully Load All Not Urgent Tasks!', data: notUrgentTasksWithDates});
     return;
 }
