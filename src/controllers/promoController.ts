@@ -195,3 +195,39 @@ export const getTodayPromoList = async (req: AuthRequest,res: Response) => {
     res.status(202).json({message: 'Successfully Load Today Promo List!', data: todayPromos});
     return;
 }
+
+
+export const getPromoByDate = async (req: AuthRequest,res: Response) => {
+
+    const date = req.params.date;
+
+    if(!date){
+        res.status(401).json({message: 'Require Date To Get Promo By Date!', data: null});
+        return;
+    }
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+    
+    const now = new Date(date);
+    const offsetMs = now.getTimezoneOffset() * 60 * 1000;
+    const localDate = new Date(now.getTime() - offsetMs);
+
+    const start = localDate.setHours(0,0,0,0);
+    const end = localDate.setHours(23, 59, 59, 999);
+    
+    let filter2 = {userId: user._id, date: {$gte: start, $lte: end}};
+    const promos = await Promo.find(filter2).sort({date: 'desc'});
+
+    res.status(202).json({message: 'Successfully Load Promo Of Date: '+date, data: promos});
+    return;
+}
