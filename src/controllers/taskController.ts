@@ -611,3 +611,32 @@ export const getCompleteTasks = async (req: AuthRequest,res: Response) => {
     res.status(202).json({message: 'Successfully Load All Complete Tasks', data: completeTasksWithDates});
     return;
 }
+
+
+export const getTasksByDate = async (req: AuthRequest,res: Response) => {
+
+    const date = req.params.date;
+
+    if(!date){
+        res.status(401).json({message: 'Date Is Require To Get Tasks On That Day!', data: null});
+        return;
+    }
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+        
+    let filter2 = {userId: user._id, date: new Date(date)}
+    const tasks = await Task.find(filter2);
+
+    res.status(202).json({message: 'Successfully Load Tasks Of Date: '+date, data: tasks});
+    return;
+}
