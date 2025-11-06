@@ -7,7 +7,9 @@ import { Role } from '../models/userModel';
 const router = express.Router();
 
 router.post('/signup',signup);
+
 router.post('/signin',signin);
+
 router.post('/admin/register',authentication,authorization([Role.ADMIN]),adminRegister);
 
 export default router;
