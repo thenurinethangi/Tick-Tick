@@ -16,6 +16,6 @@ export const getUserDetails = async (req : AuthRequest,res: Response) => {
         return;
     }
 
-    res.status(202).json({message: 'Successfully Load User Deatils!', data: user});
+    res.status(202).json({message: 'Successfully Load User Deatils!', data: user });
     return;
 }

@@ -408,7 +408,12 @@ export const getAllTasks = async (req: AuthRequest,res: Response) => {
         return;
     }
 
-    let filter2 = {userId: user._id}
+    const dayAfter7Days = new Date();
+    dayAfter7Days.setDate(dayAfter7Days.getDate() + 6);
+
+    const end = dayAfter7Days.setHours(23, 59, 59, 999);
+
+    let filter2 = {userId: user._id, date: {$gt: end}}
     const allTasks = await Task.find(filter2);
 
     res.status(202).json({message: 'Successfully Load All Tasks', data: allTasks});
@@ -526,5 +531,49 @@ export const getOverdueTasks = async (req: AuthRequest,res: Response) => {
     const overdueTasks = await Task.find(filter2);
 
     res.status(202).json({message: 'Successfully Load Overdue Tasks', data: overdueTasks});
+    return;
+}
+
+
+export const getDeletedTasks = async (req: AuthRequest,res: Response) => {
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+
+    let filter2 = {userId: user._id, status: Status.DELETE}
+    const deletedTasks = await Task.find(filter2);
+
+    res.status(202).json({message: 'Successfully Load All Deleted Tasks', data: deletedTasks});
+    return;
+}
+
+
+export const getNotDoTasks = async (req: AuthRequest,res: Response) => {
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+
+    let filter2 = {userId: user._id, status: Status.NOTDO}
+    const notdoTasks = await Task.find(filter2);
+
+    res.status(202).json({message: 'Successfully Load All Not Do Tasks', data: notdoTasks});
     return;
 }
