@@ -25,6 +25,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/v1/auth',authRouter);
+
+app.use(authentication);
+
 app.use('/api/v1/task',taskRouter);
 app.use('/api/v1/note',noteRouter);
 app.use('/api/v1/promo',promoRouter);

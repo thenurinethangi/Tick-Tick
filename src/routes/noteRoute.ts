@@ -1,15 +1,16 @@
 import express from 'express'
 import { addNote, deleteNote, editNote, getAllNotes } from '../controllers/noteController';
-import { authentication } from '../middlewares/authentication';
+import { authorization } from '../middlewares/authorization';
+import { Role } from '../models/userModel';
 
 const router = express.Router();
 
-router.post('/add',authentication,addNote);
+router.post('/add',authorization([Role.USER]),addNote);
 
-router.delete('/delete/:id',authentication,deleteNote);
+router.delete('/delete/:id',authorization([Role.USER]),deleteNote);
 
-router.put('/edit',authentication,editNote);
+router.put('/edit',authorization([Role.USER]),editNote);
 
-router.get('/all',authentication,getAllNotes);
+router.get('/all',authorization([Role.USER]),getAllNotes);
 
 export default router;
