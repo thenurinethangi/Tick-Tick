@@ -577,3 +577,37 @@ export const getNotDoTasks = async (req: AuthRequest,res: Response) => {
     res.status(202).json({message: 'Successfully Load All Not Do Tasks', data: notdoTasks});
     return;
 }
+
+
+export const getCompleteTasks = async (req: AuthRequest,res: Response) => {
+
+    if(!req.username){
+        res.status(401).json({message: 'Please Signin!', data: null});
+        return;
+    }
+
+    let filter1 = {username: req.username};
+    const user = await User.findOne(filter1);
+    if(!user){
+        res.status(401).json({message: 'Please Signup!', data: null});
+        return;
+    }
+
+    const filter2 = {status: Status.COMPLETE};
+    const filter3 = {date: true, _id: false};
+    const dateList = await Task.find(filter2,filter3).sort({date: 'asc'});
+
+    const completeTasksWithDates = [];
+    for (let i = 0; i < dateList.length; i++) {
+        const e = dateList[i];
+
+        let filter4 = {userId: user._id, date: e.date}
+        const t = await Task.find(filter4);
+        
+        const element = {i: {date: e.date, tasks: t}};
+        completeTasksWithDates.push(element);
+    }
+
+    res.status(202).json({message: 'Successfully Load All Complete Tasks', data: completeTasksWithDates});
+    return;
+}
