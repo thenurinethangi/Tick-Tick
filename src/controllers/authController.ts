@@ -5,24 +5,25 @@ import { generateToken } from "../utils/jwtutil"
 
 export const signup = async (req: Request, res: Response) => {
 
-    const {username, fullName, email, password} = req.body;
+    const {email, password} = req.body;
 
-    if(!username || !fullName || !email || !password){
+    if(!email || !password){
         res.status(400).json({message: 'All Field Reqired!', data: null});
         return;
     }
     
-    let filter1 = {username: username} 
+    let filter1 = {email: email} 
     let existUsers = await User.find(filter1);
     if(existUsers.length>0){
-        res.status(400).json({message: 'This Username Already Exist, Try Another!', data: null});
+        res.status(400).json({message: 'This Email Already Exist, Try Another!', data: null});
         return;
     }
 
     const hashedPassword = bcryptjs.hashSync(password,10);
 
+    const fullName = String(email).split('@')[0];
+
     const newUser = new User({
-        username,
         fullName,
         email,
         password: hashedPassword,
@@ -38,14 +39,14 @@ export const signup = async (req: Request, res: Response) => {
 
 export const signin = async (req: Request, res: Response) => {
 
-    const {username, password} = req.body;
+    const {email, password} = req.body;
 
-    if(!username || !password){
+    if(!email || !password){
         res.status(400).json({message: 'All Field Reqired!', data: null});
         return;
     }
     
-    let filter1 = {username: username} 
+    let filter1 = {email: email} 
     let user = await User.findOne(filter1);
     if(!user){
         res.status(400).json({message: 'User Not Exist, Please Signup!', data: null});
@@ -68,14 +69,14 @@ export const signin = async (req: Request, res: Response) => {
 
 export const adminRegister = async (req: Request, res: Response) => {
 
-    const {username, fullName, email, password} = req.body;
+    const {fullName, email, password} = req.body;
 
-    if(!username || !fullName || !email || !password){
+    if(!fullName || !email || !password){
         res.status(400).json({message: 'All Field Reqired!', data: null});
         return;
     }
     
-    let filter1 = {username: username} 
+    let filter1 = {username: email} 
     let existUser = await User.findOne(filter1);
 
     if(existUser && existUser.roles.includes(Role.ADMIN)){
@@ -99,7 +100,6 @@ export const adminRegister = async (req: Request, res: Response) => {
         const hashedPassword = bcryptjs.hashSync(password,10);
 
         const newUser = new User({
-            username,
             fullName,
             email,
             password: hashedPassword,
