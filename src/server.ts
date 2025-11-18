@@ -7,6 +7,7 @@ import taskRouter from './routes/taskRoute'
 import noteRouter from './routes/noteRoute'
 import promoRouter from './routes/promoRoute'
 import userRouter from './routes/userRoute'
+import emailRouter from './routes/emailRoute'
 import { authentication } from './middlewares/authentication';
 import cookieParser from 'cookie-parser';
 dotenv.config();
@@ -18,6 +19,7 @@ const app = express();
 app.use(cors({
     origin: ["http://localhost:5173"],
     methods: ["GET","POST","PUT","DELETE"],
+    credentials: true
 }));
 
 app.use(express.json());
@@ -25,6 +27,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/v1/auth',authRouter);
+app.use('/api/v1/email',emailRouter);
 
 app.use(authentication);
 
